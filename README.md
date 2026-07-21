@@ -60,21 +60,66 @@ cloudflared tunnel --url http://localhost:9010
 ```
 重启 Claude Code 后可用 `check_phone_messages` / `send_phone_message` 工具。
 
-## .env 配置项
+## AI 后端
+
+`.env` 里改 `AI_BACKEND` 一键切换：
+
+**Claude Code** (默认，支持 DeepSeek 等第三方模型)
+```bash
+AI_BACKEND=claude
+# 前提: Claude Code 已安装并登录
+```
+
+**Codex CLI**
+```bash
+AI_BACKEND=codex
+# 前提: npm install -g @openai/codex
+```
+
+**直接调 API** (DeepSeek / OpenAI / Groq)
+```bash
+AI_BACKEND=api
+API_KEY=sk-xxx
+API_BASE=https://api.deepseek.com
+API_MODEL=deepseek-chat
+```
+
+## 手机访问
+
+需要隧道穿透内网。任选一种：
+
+**Cloudflare Tunnel** (免费，无需注册)
+```bash
+cloudflared tunnel --url http://localhost:9010
+```
+
+**Tailscale** (免费，国内可用)
+```
+PC 和手机各装 Tailscale → 手机浏览器打开 http://<PC的Tailscale IP>:9010
+```
+
+## 配置项
+
 | 变量 | 默认 | 说明 |
 |------|------|------|
-| WORK_DIR | 当前目录 | Claude 工作目录 |
-| SYSTEM_PROMPT | 通用提示 | 自定义 AI 角色 |
-| AI_BACKEND | claude | AI 后端(claude/codex) |
+| AI_BACKEND | claude | claude / codex / api |
+| WORK_DIR | . | AI 工作目录 |
+| SYSTEM_PROMPT | - | 自定义 AI 角色 |
 | AI_TIMEOUT | 300 | 超时秒数 |
-| PORT | 9010 | Web 服务端口 |
+| PORT | 9010 | Web 端口 |
+| API_KEY | - | API 模式密钥 |
+| API_BASE | api.deepseek.com | API 地址 |
+| API_MODEL | deepseek-chat | 模型名 |
 
-## 工作原理
+## 工作流程
+
 ```
-手机 → Cloudflare隧道 → phone_bridge.py → Claude Code CLI → DeepSeek → 回复
-                        ├─ Web 服务 (Flask)
-                        ├─ Agent 线程 (自动处理消息)
-                        └─ MCP 接口 (Claude Code 原生调用)
+手机浏览器 → 隧道 → phone_bridge.py → Claude/Codex/API → 回复手机
+                     ├─ Web 服务 (Flask)
+                     ├─ Agent 线程 (后台自动处理)
+                     └─ MCP 接口 (Claude Code 原生扩展)
 ```
 
-MIT License
+## License
+
+MIT
