@@ -120,6 +120,29 @@ PC 和手机各装 Tailscale → 手机浏览器打开 http://<PC的Tailscale IP
                      └─ MCP 接口 (Claude Code 原生扩展)
 ```
 
+## 优势
+
+- **零注册** — 不绑 Telegram/微信/Discord，不注册任何账号
+- **模型自由** — Claude/Codex/Direct API 一键切换，不锁厂商
+- **越用越聪明** — 知识库自积累，纠正过的错误不犯第二次
+- **跨平台** — Windows/Mac/Linux，启动命令完全一致
+- **MCP 原生** — Claude Code 内直接调 `check_phone_messages`
+- **一个文件** — 核心逻辑全在 `phone_bridge.py`，读代码 5 分钟
+
+## 劣势
+
+- **回复慢** — `claude -p` 冷启动 10s + 推理 15s，非实时聊天
+- **幻觉得手动修** — AI 偶尔编造答案，需要用知识库纠正
+- **免费隧道不稳** — cloudflared 地址重启会变，国内可能抽风
+- **PC 必须开着** — 架构前提，没法绕过
+- **不是产品** — 是个人工具，没有用户系统、权限管理、监控面板
+
+## 适合谁
+
+- 有自己交易/开发系统，想手机遥控的人
+- 不想依赖第三方平台（Telegram/微信）的人
+- 用 DeepSeek 等非 Anthropic 模型的人
+
 ## License
 
 MIT
