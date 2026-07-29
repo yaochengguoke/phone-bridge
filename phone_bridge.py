@@ -39,7 +39,18 @@ def load_env():
     return cfg
 
 cfg = load_env()
-SYSTEM_PROMPT = cfg['SYSTEM_PROMPT']
+_CTX_FILE = os.path.join(os.path.dirname(__file__), "量化数据", "agent_context.txt")
+_USER_BG = open(_CTX_FILE, encoding="utf-8").read() if os.path.exists(_CTX_FILE) else ""
+
+_KB_FILE = os.path.join(os.path.dirname(__file__), "量化数据", "knowledge.md")
+_KNOWLEDGE = open(_KB_FILE, encoding="utf-8").read() if os.path.exists(_KB_FILE) else ""
+
+SYSTEM_PROMPT = (
+    "ReAct: Think->Act->Observe->Answer. 先查后答, 中文回复.\n"
+    "=== Knowledge ===\n" + _KNOWLEDGE + "\n=== Context ===\n" + _USER_BG + "\n=== end ==="
+)
+WORK_DIR = r"C:\MyProject\返璞量化"
+
 WORK_DIR = cfg['WORK_DIR']
 PORT = cfg['PORT']
 
@@ -54,6 +65,15 @@ def save_messages(msgs):
 
 messages = load_messages()
 to_phone = queue.Queue()
+
+# Cloudflared URL tracking — read from file updated by cloudflared
+_tunnel_url = ''
+_tunnel_file = os.path.join(os.path.dirname(__file__), '量化数据', 'tunnel_url.txt')
+if os.path.exists(_tunnel_file):
+    try:
+        with open(_tunnel_file) as f:
+            _tunnel_url = f.read().strip()
+    except: pass
 
 def add_message(role, text, reply_to=None):
     msg = {'id': str(uuid.uuid4())[:8], 'role': role, 'text': text,
@@ -280,7 +300,7 @@ def get_messages():
 
 @app.route('/health')
 def health():
-    return jsonify({'ok': True, 'time': datetime.now().isoformat()})
+    return jsonify({'ok': True, 'time': datetime.now().isoformat(), 'url': _tunnel_url})
 
 def run_web():
     app.run(host='127.0.0.1', port=PORT, debug=False, use_reloader=False)
